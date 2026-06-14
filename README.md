@@ -14,6 +14,80 @@ It mirrors `ruptures` v1.1.10 closely enough that its breakpoint outputs are
 `ruptures`, see `tests/`). On top of that, it adds a **categorical/numeric
 preprocessing layer** that `ruptures` does not have.
 
+## Installation in a locked-down environment (no `pip`)
+
+There is nothing to install and nothing to compile — you just need Python to
+*find* the package. The repository looks like this:
+
+```
+ruptures_lite/            <- repo root (what you clone/download)
+├── ruptures_lite/        <- the importable package (this is the folder that matters)
+│   ├── __init__.py
+│   ├── detection/ costs/ ...
+├── tests/
+└── README.md
+```
+
+The thing you `import` is the **inner** `ruptures_lite/` folder. To use it, the
+folder that *contains* it must be on Python's import path. Pick whichever of
+these fits your machine.
+
+**First, get the files onto the target machine** (any one of these):
+
+```bash
+git clone https://github.com/doolingdavid/ruptures_lite.git
+# or, with no git: download the ZIP from the GitHub "Code" button and unzip it,
+# or scp/copy the folder over from another machine.
+```
+
+**Option A — copy the package next to your script (simplest).**
+Copy just the inner `ruptures_lite/` package folder into the same directory as the
+`.py` script or notebook you run. Python always searches the script's own
+directory, so this just works:
+
+```
+my_project/
+├── analysis.py
+└── ruptures_lite/        <- the inner package folder, copied here
+```
+```python
+# analysis.py
+import ruptures_lite as rpt   # found automatically
+```
+
+**Option B — leave it anywhere and add it to `sys.path` at runtime.**
+Put the line *before* the import. The path you add is the folder that *contains*
+the inner package (i.e. the repo root), not the inner folder itself:
+
+```python
+import sys
+sys.path.insert(0, "/home/you/code/ruptures_lite")   # repo root (holds the inner pkg)
+import ruptures_lite as rpt
+```
+
+In a Jupyter notebook the same line works in the first cell.
+
+**Option C — use the `PYTHONPATH` environment variable** (no code change):
+
+```bash
+export PYTHONPATH="/home/you/code/ruptures_lite:$PYTHONPATH"   # repo root
+python analysis.py
+```
+
+On Windows: `set PYTHONPATH=C:\path\to\ruptures_lite;%PYTHONPATH%`.
+
+**Verify it loaded:**
+
+```python
+import ruptures_lite as rpt
+print(rpt.__version__, "mirrors ruptures", rpt.__ruptures_compat__)
+```
+
+> Note: this is a source-on-`sys.path` deployment, so `pip list` /
+> `conda list` will **not** show `ruptures_lite` — that's expected and fine. The
+> only requirement of the target environment is that `numpy`, `scipy`, `pandas`
+> and `scikit-learn` are importable (matplotlib only if you call `display`).
+
 ## Basic usage
 
 The canonical [`ruptures` homepage](https://centre-borelli.github.io/ruptures-docs/)
