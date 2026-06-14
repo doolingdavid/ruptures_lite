@@ -14,6 +14,36 @@ It mirrors `ruptures` v1.1.10 closely enough that its breakpoint outputs are
 `ruptures`, see `tests/`). On top of that, it adds a **categorical/numeric
 preprocessing layer** that `ruptures` does not have.
 
+## Basic usage
+
+The canonical [`ruptures` homepage](https://centre-borelli.github.io/ruptures-docs/)
+example works unchanged (apart from the import) — `ruptures_lite` ships the same
+`pw_constant` generator, the `Pelt` estimator, and a `display` helper:
+
+```python
+import matplotlib.pyplot as plt
+import ruptures_lite as rpt
+
+# generate signal
+n_samples, dim, sigma = 1000, 3, 4
+n_bkps = 4  # number of breakpoints
+signal, bkps = rpt.pw_constant(n_samples, dim, n_bkps, noise_std=sigma)
+
+# detection
+algo = rpt.Pelt(model="rbf").fit(signal)
+result = algo.predict(pen=10)
+
+# display
+rpt.display(signal, bkps, result)
+plt.show()
+```
+
+![Basic usage: true regimes shaded, detected change points as dashed lines](docs/basic_usage.png)
+
+Shaded bands are the *true* regimes; dashed vertical lines are the *detected*
+change points. (`display` is the only feature that needs matplotlib, and it is
+imported lazily — the rest of the package runs without it.)
+
 ## Why this exists
 
 `ruptures` ships Cython/C extensions (`ekcpd`, `convert_path_matrix`) that need a
